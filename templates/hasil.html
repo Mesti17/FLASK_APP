@@ -73,6 +73,7 @@
         <tr class="text-center">
           <th scope="col" style="border: solid 3px #fff">Username</th>
           <th scope="col" style="border: solid 3px #fff">Tweet</th>
+          <th scope="col" style="border: solid 3px #fff">Label</th>
         </tr>
       </thead>
       {% for item in data %}
@@ -80,6 +81,7 @@
         <tr style="border: solid 3px #fff">
           <th>{{ item["Username"] }}</th>
           <td>{{ item["Tweet"] }}</td>
+          <td>{{ item["Label"] }}</td>
         </tr>
       {% endfor %}
       </tbody>
