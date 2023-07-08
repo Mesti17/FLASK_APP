@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request
 import tweepy
 import mysql.connector
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, String, Table, MetaData
+import pymysql
 import re
 import snscrape.modules.twitter as sntwitter
 import pickle
@@ -18,53 +23,40 @@ vectorizer = TfidfVectorizer()
 with open('model/vec.pickle', 'rb') as handle:
     vectorizer = pickle.load(handle)
 
-def cleanTxt(text):
-    text = re.sub('@[A-Za-z0–9]+', '', text)  # Removing @mentions
-    text = re.sub('#', '', text)  # Removing '#' hash tag
-    text = re.sub('RT[\s]+', '', text)  # Removing RT
-    text = re.sub('https?:\/\/\S+', '', text)  # Removing hyperlink
-    # remove non ASCII (emoticon, chinese word. etc)
-    text = text.encode('ascii', 'replace').decode('ascii')
-    return text
+# def cleanTxt(text):
+#     text = re.sub('@[A-Za-z0–9]+', '', text)  # Removing @mentions
+#     text = re.sub('#', '', text)  # Removing '#' hash tag
+#     text = re.sub('RT[\s]+', '', text)  # Removing RT
+#     text = re.sub('https?:\/\/\S+', '', text)  # Removing hyperlink
+#     # remove non ASCII (emoticon, chinese word. etc)
+#     text = text.encode('ascii', 'replace').decode('ascii')
+#     return text
 
 
-def searchTweets(query):
-    # teks = tweet
-    # vec = vectorizer.transform([teks])
-    # prediksi = model.predict(vec)
+def searchTweets(keyword):
+    
+    engine = create_engine('mysql+pymysql://root:@localhost:3306/capres')
+    # conn1 = engine.connect()
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-    # if prediksi == 1:
-    #     hasil = 'POSITIF'
-    # elif prediksi == 0:
-    #     hasil = 'NETRAL'
-    # else:
-    #     hasil = 'NEGATIF'
-        
-    content = []
+    # #Using pymysql
 
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
-        if i > 100:
-            break
-        username = tweet.user.username
-        pesan = tweet.content.encode("utf-8")
-        pesan_cleaned = cleanTxt(pesan.decode("utf-8"))
-        
-        #prediksi tweet
-        vec = vectorizer.transform([pesan_cleaned])
-        prediksi = model.predict(vec)
-        
-        if prediksi == 1:
-            hasil = 'POSITIF'
-        elif prediksi == 0:
-            hasil = 'NETRAL'
-        else:
-            hasil = 'NEGATIF'
-        
-        content.append({
-                'Username': username,
-                'Tweet': pesan_cleaned,
-                'Label': hasil
-            })
+    table_name = 'hasil_preprocessing'  # Replace with the actual table name
+    specific_word = keyword  # Replace with the specific word you want to search
+
+    metadata = MetaData()
+    metadata.reflect(bind=engine)
+    table = metadata.tables[table_name]
+
+    # conn2 = pymysql.connect(host='localhost', port=int(3306), user='root', password='', db='capres')
+
+    query = table.select().where(table.c.cleaning.like(f'%{specific_word}%')).limit(100)
+    results = session.execute(query)
+
+
+    for result in results:
+        print(result.username, result.cleaning)
     
     return content
 
