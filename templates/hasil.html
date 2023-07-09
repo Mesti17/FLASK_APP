@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
   <script src="https://kit.fontawesome.com/0d72e9e190.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
   <!-- Apex Chart -->
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -67,7 +69,12 @@
     </div>
 
     <!-- TWEET DATA -->
-    <div class="p mt-5 fs-5">Total tweet {{ total }}
+    
+    <div class="text-center mb-5 mt-3">
+      <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Presentase">Lihat
+        Hasil Analisis</button>
+    </div>
+    <div class="p mt-5 fs-5">Total tweet {{ total }}</div>
     <table class="table table-bordered" style="border: solid 2px #fff">
       <thead style="background-color: #F2ECE9; height: 70px; border: solid 5px #fff">
         <tr class="text-center">
@@ -109,10 +116,7 @@
     </div> -->
 
 
-    <div class="text-center mb-5 mt-3">
-      <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Presentase">Lihat
-        Hasil Analisis</button>
-    </div>
+    
   </div>
 
   <!-- Modal Presentase -->
@@ -125,60 +129,7 @@
         </div>
         <div class="modal-body">
           <div class="row">
-            <!-- <div class="col-lg-6 col-12"> -->
-              <!-- TWEET DATA -->
-              <!-- <table class="table table-bordered" style="border: solid 2px #fff">
-                <thead style="background-color: #F2ECE9; height: 70px; border: solid 5px #fff">
-                  <tr class="text-center">
-                    <th scope="col" style="border: solid 3px #fff">Username</th>
-                    <th scope="col" style="border: solid 3px #fff">Tweet</th>
-                    <th scope="col" style="border: solid 3px #fff">Sentime</th>
-                  </tr>
-                </thead>
-                <tbody style="background-color: #F2F2F2;">
-                  <tr style="border: solid 3px #fff">
-                    <th>11738273827383</th>
-                    <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque voluptatibus ad est, quibusdam
-                      maxime
-                      dolorum sed ex unde dolorum delectus? Mollitia, sint! Eligendi, quis ea.</td>
-                    <td>Negatif</td>
-                  </tr>
-                  <tr style="border: solid 3px #fff">
-                    <th>11738273827383</th>
-                    <td>Loa? Iure. Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed,
-                      consectetur
-                      eligendi consequatur non dolorum delectus? Mollitia, sint! Eligendi, quis ea.</td>
-                    <td>Positif</td>
-                  </tr>
-                  <tr style="border: solid 3px #fff">
-                    <th>11738273827383</th>
-                    <td>Lore
-                      eligendi consequatur non dolorum delectus? Mollitia, sint! Eligendi, quis ea.</td>
-                    <td>Positif</td>
-                  </tr>
-                </tbody>
-              </table> -->
-              <!-- <div class="d-flex flex-row-reverse">
-                <nav aria-label="Page navigation example">
-                  <ul class="pagination">
-                    <li class="page-item disabled">
-                      <a class=" page-link text-danger" href="#" aria-label="Previous">
-                      <span aria-hidden="true">
-                        </span>
-                          </a>
-                    </li>
-                    <li class="page-item"><a class="page-link text-white bg-danger" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link text-black" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link text-black" href="#">3</a></li>
-                    <li class="page-item">
-                      <a class="page-link text-danger" href="#" aria-label="Next">
-                        <span aria-hidden="true">></span>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-              </div> -->
-            <!-- </div> -->
+            
             <div class="col-lg-6 col-12">
               <div class="card">
                 <div class="card-header text-center fw-bold text-muted">
@@ -188,7 +139,7 @@
                   <h6 class="text-muted mb-3" data-hasil = "{{ total }}">
                     {{ total }} Tweet
                   </h6>
-                  <div id="presentase" data-prediksi="{{ total_sentimen }}"></div>
+                  <canvas id="chart"></canvas>
                 </div>
               </div>
             </div>
@@ -200,21 +151,55 @@
 
   <!-- Apex Chart OPTION -->
   <script>
-    var hasil_sentimen = document.querySelector(".card-body");
-    var all_data = document.querySelector("presentase");
-    var total_positif = Number(all_data.Total_Net);
+    var total_pos = JSON.parse('{{ total_pos|safe }}');
+    var total_net = JSON.parse('{{ total_net|safe }}');
+    var total_neg = JSON.parse('{{ total_neg|safe }}');
 
-    var options = {
-      chart: {
-        type: 'donut'
+    var ctx = document.getElementById('chart').getContext('2d');
+
+    const datachart_teks = {
+    labels: [
+        "Positif",
+        "Netral",
+        "Negatif", 
+      ],
+      datasets: [{
+        label: 'Total Data',
+        data: [total_pos, total_net, total_neg],
+        backgroundColor: [
+        'rgb(3, 201, 169)',
+        'rgb(54, 162, 235)',
+        'rgb(246, 71, 71)',
+        ],
+        hoverOffset: 4
+      }]
+}
+
+    const config_teks = {
+      type: 'doughnut',
+      data: datachart_teks,
+      options: {
+        responsive: true,
       },
-      series: ["{{ total_pos }}", "{{ total_net }}", "{{ total_neg }}"],
-      labels: ['Tweet: Positif', 'Tweet: Netral','Tweet: Negatif'],
-      colors: ['#008FFB', '#DC3545', '#DC3544']
     }
+    const myChart = new Chart(ctx, config_teks);
+    
 
-    var chart = new ApexCharts(document.getElementById("total_sentimen"), options);
-    chart.render();
+    // var hasil_sentimen = document.querySelector(".card-body");
+    // var all_data = document.querySelector("presentase");
+    // var total_positif = Number(all_data.Total_Net);
+
+    // var options = {
+    //   chart: {
+    //     type: 'donut'
+    //   },
+    //   series: [total_pos, total_net, total_neg],
+    //   labels: ['Tweet: Positif', 'Tweet: Netral','Tweet: Negatif'],
+    //   colors: ['#008FFB', '#DC3545', '#DC3544']
+    // }
+
+    // var chart = new ApexCharts(document.querySelector("#presentase"), options);
+    // chart.render();
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"

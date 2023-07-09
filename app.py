@@ -4,6 +4,7 @@ import re
 import pickle
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+import json
 
 app = Flask(__name__, template_folder="templates", static_url_path='/static')
 
@@ -45,7 +46,16 @@ def prosescari():
         
         # hasil_pred = cariTweet(message)
 
-    return render_template("hasil.html", data=hasil_cari, kata_pencarian=message, total=len(hasil_cari),total_sentimen=total_sentimen, total_pos=total_sentimen["Total_Pos"], total_net=total_sentimen["Total_Net"], total_neg=total_sentimen["Total_Neg"])
+    return render_template(
+        "hasil.html",
+        data=hasil_cari,
+        kata_pencarian=message,
+        total=len(hasil_cari),
+        total_sentimen=json.dumps(total_sentimen),
+        total_pos=json.dumps(total_sentimen["Total_Pos"]),
+        total_net=json.dumps(total_sentimen["Total_Net"]),
+        total_neg=json.dumps(total_sentimen["Total_Neg"])
+        )
 
 
 # @app.route("/proseshasil", methods=['GET', "POST"])
