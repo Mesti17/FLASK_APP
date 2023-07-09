@@ -41,10 +41,11 @@ def prosescari():
 
     if request.method == "POST":
         message = request.form['hashtag']
-        hasil_cari = cariTweet(message)
+        hasil_cari, total_sentimen = cariTweet(message)
+        
         # hasil_pred = cariTweet(message)
 
-    return render_template("hasil.html", data=hasil_cari, kata_pencarian=message, total=len(hasil_cari))
+    return render_template("hasil.html", data=hasil_cari, kata_pencarian=message, total=len(hasil_cari),total_sentimen=total_sentimen, total_pos=total_sentimen["Total_Pos"], total_net=total_sentimen["Total_Net"], total_neg=total_sentimen["Total_Neg"])
 
 
 # @app.route("/proseshasil", methods=['GET', "POST"])

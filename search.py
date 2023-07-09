@@ -16,7 +16,7 @@ app = Flask(__name__, template_folder="templates", static_url_path='/static')
 
 #Load Model
 model_path = 'model/model_nb.pickle'
-model = pickle.load(open(model_path, "rb"))
+modelNB = pickle.load(open(model_path, "rb"))
 
 #Load Vectorizer
 vectorizer = TfidfVectorizer()
@@ -34,6 +34,11 @@ with open('model/vec.pickle', 'rb') as handle:
 
 
 def searchTweets(keyword):
+    all_data = []
+    total_sentimen=dict()
+    total_pos = 0
+    total_net = 0
+    total_neg = 0
     
     engine = create_engine('mysql+pymysql://root:@localhost:3306/capres')
     # conn1 = engine.connect()
@@ -57,8 +62,33 @@ def searchTweets(keyword):
 
     for result in results:
         print(result.username, result.cleaning)
+        vec = vectorizer.transform([result.cleaning])
+        prediksi = modelNB.predict(vec)
+        
+        if prediksi == 1:
+            hasil_pred = 'POSITIF'
+            total_pos += 1
+        elif prediksi == 0:
+            hasil_pred = 'NETRAL'
+            total_net += 1
+        else:
+            hasil_pred = 'NEGATIF'
+            total_neg += 1
+        
+        all_data.append({
+            "Username": result.username,
+            "Hasil": result.cleaning,
+            "Sentimen": hasil_pred,
+            "Total_Pos": total_pos,
+            "Total_Net": total_net,
+            "Total_Neg": total_neg
+        })
+        
+    total_sentimen["Total_Pos"]= total_pos
+    total_sentimen["Total_Net"]= total_net
+    total_sentimen["Total_Neg"]= total_neg
     
-    return content
+    return all_data, total_sentimen
 
 
 def cariTweet(message):

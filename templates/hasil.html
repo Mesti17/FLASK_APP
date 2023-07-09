@@ -80,14 +80,14 @@
       <tbody style="background-color: #F2F2F2;">
         <tr style="border: solid 3px #fff">
           <th>{{ item["Username"] }}</th>
-          <td>{{ item["Tweet"] }}</td>
-          <td>{{ item["Label"] }}</td>
+          <td>{{ item["Hasil"] }}</td>
+          <td>{{ item["Sentimen"] }}</td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
 
-    <div class="d-flex flex-row-reverse">
+    <!-- <div class="d-flex flex-row-reverse">
       <nav aria-label="Page navigation example">
         <ul class="pagination">
           <li class="page-item disabled">
@@ -106,12 +106,12 @@
           </li>
         </ul>
       </nav>
-    </div>
+    </div> -->
 
 
     <div class="text-center mb-5 mt-3">
       <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Presentase">Lihat
-        Hasil Analisis &circlearrowleft;</button>
+        Hasil Analisis</button>
     </div>
   </div>
 
@@ -125,9 +125,9 @@
         </div>
         <div class="modal-body">
           <div class="row">
-            <div class="col-lg-6 col-12">
+            <!-- <div class="col-lg-6 col-12"> -->
               <!-- TWEET DATA -->
-              <table class="table table-bordered" style="border: solid 2px #fff">
+              <!-- <table class="table table-bordered" style="border: solid 2px #fff">
                 <thead style="background-color: #F2ECE9; height: 70px; border: solid 5px #fff">
                   <tr class="text-center">
                     <th scope="col" style="border: solid 3px #fff">Username</th>
@@ -157,8 +157,8 @@
                     <td>Positif</td>
                   </tr>
                 </tbody>
-              </table>
-              <div class="d-flex flex-row-reverse">
+              </table> -->
+              <!-- <div class="d-flex flex-row-reverse">
                 <nav aria-label="Page navigation example">
                   <ul class="pagination">
                     <li class="page-item disabled">
@@ -177,18 +177,18 @@
                     </li>
                   </ul>
                 </nav>
-              </div>
-            </div>
+              </div> -->
+            <!-- </div> -->
             <div class="col-lg-6 col-12">
               <div class="card">
                 <div class="card-header text-center fw-bold text-muted">
                   Presentase Sentimen
                 </div>
                 <div class="card-body">
-                  <h6 class="text-muted mb-3">
-                    5.987,34 Tweet
+                  <h6 class="text-muted mb-3" data-hasil = "{{ total }}">
+                    {{ total }} Tweet
                   </h6>
-                  <div id="presentase"></div>
+                  <div id="presentase" data-prediksi="{{ total_sentimen }}"></div>
                 </div>
               </div>
             </div>
@@ -200,15 +200,20 @@
 
   <!-- Apex Chart OPTION -->
   <script>
+    var hasil_sentimen = document.querySelector(".card-body");
+    var all_data = document.querySelector("presentase");
+    var total_positif = Number(all_data.Total_Net);
+
     var options = {
       chart: {
         type: 'donut'
       },
-      series: [60, 40],
-      labels: ['Tweet: Positif', 'Tweet: Negatif'],
-      colors: ['#008FFB', '#DC3545']
+      series: ["{{ total_pos }}", "{{ total_net }}", "{{ total_neg }}"],
+      labels: ['Tweet: Positif', 'Tweet: Netral','Tweet: Negatif'],
+      colors: ['#008FFB', '#DC3545', '#DC3544']
     }
-    var chart = new ApexCharts(document.querySelector("#presentase"), options);
+
+    var chart = new ApexCharts(document.getElementById("total_sentimen"), options);
     chart.render();
   </script>
 
