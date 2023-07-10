@@ -56,28 +56,28 @@ def searchTweets(keyword):
 
     # conn2 = pymysql.connect(host='localhost', port=int(3306), user='root', password='', db='capres')
 
-    query = table.select().where(table.c.cleaning.like(f'%{specific_word}%')).limit(100)
+    query = table.select().where(table.c.pesan.like(f'%{specific_word}%')).limit(100)
     results = session.execute(query)
 
 
     for result in results:
-        print(result.username, result.cleaning)
-        vec = vectorizer.transform([result.cleaning])
+        print(result.username, result.pesan)
+        vec = vectorizer.transform([result.pesan])
         prediksi = modelNB.predict(vec)
         
         if prediksi == 1:
-            hasil_pred = 'POSITIF'
+            hasil_pred = 'Positif'
             total_pos += 1
         elif prediksi == 0:
-            hasil_pred = 'NETRAL'
+            hasil_pred = 'Netral'
             total_net += 1
         else:
-            hasil_pred = 'NEGATIF'
+            hasil_pred = 'Negatif'
             total_neg += 1
         
         all_data.append({
             "Username": result.username,
-            "Hasil": result.cleaning,
+            "Hasil": result.pesan,
             "Sentimen": hasil_pred,
             "Total_Pos": total_pos,
             "Total_Net": total_net,
